@@ -7,9 +7,24 @@ import random
 import time
 from datetime import datetime
 import urllib.parse
+import json
 
 SOCKS_VERSION = 5
 inviteD= False
+
+def data_decode(hex_payload):
+    url = 'https://polydevapi.vercel.app/decode'
+
+    payload = {
+        "Decrypted_Payload": hex_payload
+    }
+
+    response = requests.post(url, json=payload)
+
+    if response.ok:
+        return response.json()
+    else:
+        return {"error": response.text}
 
 def Decrypted_id(id_value):
     url = f"https://polydevapi.vercel.app/decrypt_id?id={id_value}"
@@ -176,6 +191,14 @@ def dance(id, dance_nbr=None):
     emote = random_emote(dance_nbr) if dance_nbr is not None else "c1fab8b103"
     return f"050000002008{id}100520162a1408{id}10{emote}2a0608{id}"
 
+def Encrypt(id_value):
+    url = f"https://polydevapi.vercel.app/ecrypt_id?id={id_value}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("ecrypted_id")
+    else:
+        return f"{id_value}"
 
 def ResponseMsg(info,client_socket, client_id):
     time.sleep(0.4)
@@ -193,7 +216,6 @@ class Proxy:
     def __init__(self):
         self.username = "1"
         self.password = "1"
-        self.website = "https://api-ghost.vercel.app/FFcrypto/{id}"
     def spam__invite(self,data, remote):
         global invit_spam
         while invit_spam:
@@ -204,20 +226,6 @@ class Proxy:
                time.sleep(0.2)
             except:
                    pass
-
-    def Encrypt_ID(self, id):
-        api_url = self.website.format(id=id)
-        
-        try:
-            response = requests.get(api_url)
-            if response.status_code == 200:
-                return response.text
-            else:
-                print("فشل في جلب البيانات. رمز الحالة:", response.status_code)
-                return None
-        except requests.RequestException as e:
-            print("فشل الطلب:", e)
-            return None
 
     def handle_client(self, connection):
         version, nmethods = connection.recv(2)
@@ -315,20 +323,13 @@ class Proxy:
                 if '1200' in data.hex()[0:4] and b'GroupID' in data:
                     pass
                 else:
-                    if '1200' in data.hex()[:4]:
-                        start_marker = "08"
-                        end_marker = "10"
-                        start_index = data.hex().find(start_marker) + len(start_marker)
-                        end_index = data.hex().find(end_marker, start_index)
-                        if start_index != -1 and end_index != -1:
-                            enc_client_id = data.hex()[start_index:end_index]
-                            self.EncryptedPlayerid = enc_client_id
-                            self.target_id = self.Encrypt_ID(8763797454)
+                    if '1200' in data.hex()[:4] and len(data.hex()) > 100:
+                        parsed_data = data_decode(data.hex()[36:])
+                        dec_id = parsed_data['1']['data']
+                        self.EncryptedPlayerid = Encrypt(dec_id)
+                        self.target_id = Encrypt(8763797454)
                 if "0500" in data.hex()[:4]:
                     self.sock0500 = client
-                
-                if '1200' in data.hex()[0:4] and b'/get' in data:
-                	self.sock0500.send(bytes.fromhex("050000058108f1eda9e709100520062af40a0886f6d8e80112024d451801200332af050886f6d8e801121ee28094cd9ecd9fcd9ee29885e29a91efbca7efbca8efbcafefbcb3efbcb41a024d45208c8de9bf0628463087cbd13038324218a6c2e860869be06183938866a9b7d0649cb9ce64ddcea561480150ad025898086083d9d0ad0368f4dc8dae0382012708dbdaf1eb04120d7be28886c2a9cf80c2a9c2ae7d180720e187d4f0042a0808c89d85f30410038801c2ffc4b00392010b010407090a0b1216191a209801ae02a00103a8018dfff5b103c00101c80101e80101880203920207c205b60969a926aa0207080110d8362006aa0205080210a038aa0205080f10e432aa0205081710aa51aa02050818108242aa0205081a10b836aa0205081b10e432aa0205081c109a42aa0205082010da3daa0205082110f02eaa0205082210c935aa0205082310eb2faa0205082b10f02eaa0205083110f02eaa0205083910f95daa0205084910fa33aa0205083d10e432aa0205084110e432aa0205084d10e432aa0205083410e432aa0205082810f02eaa0205082910e432c202a90112031a01011a100851120265661a08086620c81528d4071a6f0848121001040506070203f1a802f4a802f2a8021a0b0806100118880420a48e1c1a0b0801100318810320f0a0031a0b0802100418fb0620e7f4041a0b0803100418ef0520ddbb0b1a0b0807100118ff0120c589051a0d08f1a802100318cd0320dc81051a0908f3a802100120b14d1a1208501201631a0b0863100a18940720d3d90c220b120965890eed0ed904ad02d802a8a38daf03ea020410011801f202090882cab5ee0110a3088a030092030098038af5d3b90ba2031eefbca7efbca8efbcafefbcb3efbcb4e299a8efbcb4efbca5efbca1efbcada80366c2030a081f100f180220012801ea0300f20300800464900402aa040408011001aa040e080110031dabaaaa3e250000803faa0407080f1dcdcccc3e32ca0408f1eda9e7091222e1b58dcba2e1b597e385a4cf81eaaaaeeaaab6eaaa97e1a694eaab80eaaa9ce298821a024d4520868fe9bf0628343084cbd1304218c191e361cc91e6608b9dd164c298a361c8bcce6480c38566480150b80258861268e3b58fae037a05a1a4c5b00382012808f6daf1eb04120ed8b9d980d985d8a7d986d980d98a180720b888d4f0042a0808d19d85f30410039201090107090a0b12191a209801bd02a00148c00101e80101880208920208b930ea07c62cd50faa020a080110e43218807d2001aa02050802109035aa0205080f10f032aa0205081710be4eaa0205081810b83caa0205081c108139aa0205082010a539aa0205082110e83caa0205082210c63baa0205082b10cd3daa0205083110f02eaa0205083910e052aa02050849109633aa0205081a10f032aa0205082310f032aa0205083d10f032aa0205084110f032aa0205084d10e432aa0205081b10f032aa0205083410f032aa0205082810c03eaa0205082910e432b00201c2022712031a01011a0f0848120b0104050607f1a802f4a8021a0508501201631a060851120265662200d802a8a38daf03ea020410011801f202090881cab5ee0110bf058a030092030098038af5d3b90ba2031eefbca7efbca8efbcafefbcb3efbcb4e299a8efbcb4efbca5efbca1efbcadc2030a082c1001180320012801c2030a081f100f180320042801ca030a0802108ce4eebf061801e203024f52ea0300f20300800464900402aa040408011001aa040e080110031d0000c03f25abaa2a3eaa0411080f1de438ae3f25e6143c3e2d5555153f3a030104164001500260016801721e313734343435353330383236393930313939305f767033787437773468318801819080d8c0b4d1c21aa20100b001c902ea010449444332fa011e313734343435353330383236393930343935315f75786370747872796939"))
                 if '1200' in data.hex()[0:4] and b'/dance' in data:
                 	i = re.split('/dance', str(data))[1]
                 	id = str(i).split('(\\x')[0].strip()
