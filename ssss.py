@@ -35,20 +35,6 @@ def Decrypted_id(id_value):
     else:
         return f"{id_value}"
 
-def send_spam(player_id):
-    if not player_id.isdigit():
-        print("Error: The player_id must contain numbers only.")
-        return
-    
-    url = f"https://lovely-moral-asp.ngrok-free.app/api/spam_squad?id={player_id}"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        print("Request was successful")
-        print(response.json())
-    else:
-        print(f"Error: {response.status_code}")
-
 
 def telegram(m):
     print(m)
