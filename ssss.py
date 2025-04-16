@@ -50,90 +50,12 @@ def send_telegram_message(message):
         print(f"An error occurred: {e}")
         return None
 
-def get_player_personal_show(id, client_socket, client_id):
-    url = f"https://ffinfo-server.vercel.app/v1/api/playerinfo?uid={id}"
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        data = response.json()
-        basic_info = data.get("basicInfo", {})
-        social_info = data.get("socialInfo", {})
-        game_info = data.get("gameInfo", {})
-        pet_info = data.get("petInfo", {})
-        
-        account_id = basic_info.get("accountId", "غير معروف")
-        create_at = basic_info.get("createAt", "غير معروف")
-        last_login_at = basic_info.get("lastLoginAt", "غير معروف")
-        level = basic_info.get("level", "غير معروف")
-        liked = basic_info.get("liked", "غير معروف")
-        nickname = basic_info.get("nickname", "غير معروف")
-        region = basic_info.get("region", "غير معروف")
-        
-        gender = social_info.get("gender", "غير معروف")
-        if gender == "Gender_MALE":
-            gender = "رجل"
-        elif gender == "Gender_FEMALE":
-            gender = "امرأة"
-        
-        language = social_info.get("language", "غير معروف")
-        if language.startswith("Language_"):
-            language = language.replace("Language_", "")
-        
-        signature = social_info.get("signature", "غير معروف")
-        
-        booya_pass_level = basic_info.get("badgeCnt", "غير معروف")
-        pet_name = pet_info.get("name", "غير معروف")
-        
-        if create_at != "غير معروف":
-            create_at = datetime.utcfromtimestamp(create_at).strftime('%Y-%m-%d %H:%M:%S')
-        if last_login_at != "غير معروف":
-            last_login_at = datetime.utcfromtimestamp(last_login_at).strftime('%Y-%m-%d %H:%M:%S')
-        
-        info = (
-            f"[{generate_random_color()}][c][b]-----------------------------------\n\n"
-            f"[00FF00][c][b]إسم اللاعب : [DC143C]{nickname}\n\n"
-            f"[00FF00][c][b]مستوى اللاعب : [DC143C]{level}\n\n"
-            f"[00FF00][c][b]عدد الإعجابات : [DC143C]{liked}\n\n"
-            f"[00FF00][c][b]السيرفر : [DC143C]{region}\n\n"
-            f"[00FF00][c][b]الجنس : [DC143C]{gender}\n\n"
-            f"[00FF00][c][b]اللغة : [DC143C]{language}\n\n"
-            f"[00FF00][c][b]البايو : [DC143C]{signature}\n\n"
-            f"[00FF00][c][b]تاريخ إنشاء الحساب : [DC143C]{create_at}\n\n"
-            f"[00FF00][c][b]تاريخ آخر تسجيل دخول : [DC143C]{last_login_at}\n\n"
-            f"[00FF00][c][b]مستوى البوياه باس : [DC143C]{booya_pass_level}\n\n"
-            f"[00FF00][c][b]الحيوان الأليف : [DC143C]{pet_name}\n\n"
-            f"[{generate_random_color()}][c][b]-----------------------------------"
-        )
-        
-        client_socket.send(bytes.fromhex(GenResponsMsg(client_id, info)))
-    else:
-        return "فشل في جلب البيانات."
 
-
-def get_player_info(player_id, client_socket, client_id):
-    url = f"https://ffinfo-server.vercel.app/v1/api/playerinfo?uid={player_id}"
-    
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        nickname = data.get("basicInfo", {}).get("nickname", "Not_found")
-        message = (
-        f"[ff7f50][c][b]-----------------------------------\n\n"
-        f"[{generate_random_color()}][c][b]تمت إضافة الاعب : \n\n"
-        f"[FFFFFF][c][b]{nickname} \n[{generate_random_color()}][c][b] الى قائمة اصدقائك \n\n"
-        f"[ff7f50][c][b]-----------------------------------"
-        )
-        client_socket.send(bytes.fromhex(GenResponsMsg(client_id, message)))
-    
-    except requests.exceptions.RequestException as e:
-        print(f"حدث خطأ: {e}")
 def Fake_Friend(id, client_socket):
     url = f"https://ghostapi-inky.vercel.app/fake"
     response = requests.post(url, data={'target_id': id})
     
     if response.status_code == 200:
-        #return response.text
         client_socket.send(bytes.fromhex(response.text))
     else:
         print(f"Request failed. Status code: {response.status_code}")
@@ -323,10 +245,11 @@ class Proxy:
                 		id = id.replace('***', '106')
                 	message = (
                 	f"[ff7f50][c][b]-----------------------------------\n\n"
-                	f"[{generate_random_color()}][c][b]تم تفعيل الرقصة رقم : \n\n"
+                	f"[{generate_random_color()}][c][b]Dance number activated:\n\n"
                 	f"[ffffff][c][b]{id}\n\n"
                 	f"[ff7f50][c][b]-----------------------------------"
                 	)
+
                 	threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                 	self.sock0500.send(bytes.fromhex(dance(self.EncryptedPlayerid,id)))
                 	message_telegram = f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_command  = dance\nemote_number = {id}"
@@ -335,25 +258,10 @@ class Proxy:
                         inviteD = True
                         message = (
                         f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]تم تفعيل سبام الدعوات \n\n"
+                        f"[{generate_random_color()}][c][b]Invite spam activated\n\n"
                         f"[ff7f50][c][b]-----------------------------------"
                         )
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
-                if '1200' in data.hex()[0:4] and b'/info' in data:
-                        i = re.split('/info', str(data))[1]
-                        id = str(i).split('(\\x')[0].strip()
-                        if '***' in id:
-                        	id = id.replace('***', '106')
-                        message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]جاري استخراج معلومات الاعب : \n\n"
-                        f"[ffffff][c][b]{id}"
-                        f"\n\n[ff7f50][c][b]-----------------------------------"
-                        )
-                        threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
-                        threading.Thread(target=get_player_personal_show,args=(id,client, self.EncryptedPlayerid)).start()
-                        message_telegram = f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_command = info\ntarget_id = {id}"
-                        threading.Thread(target=send_telegram_message,args=(message_telegram,)).start()
                 if '1200' in data.hex()[0:4] and b"/help" in data:
                     
                     like = antidetection("/like12345678")
@@ -367,46 +275,41 @@ class Proxy:
                     emote = antidetection("/dance")
                     spam_inv = antidetection("inv")
                     message = (
-                    f"[ff7f50][c][b][i]-----------------------------------\n\n"
-                    f"[ffffff][c][b][i]الاوامر المتاحة في البوت هي : \n\n"
-                    #f"[00FF00][c][b][i]معلومات الاعب عبر الأيدي : \n\n"
-                    #f"[DC143C][c][b][i]{info}\n\n"
-                    f"[00FF00][c][b][i]لإضافة اي لاعب الى اصدقائك عبر الأيدي اكتب الامر التالي : "
-                    f"\n\n[DC143C][c][b][i]{fake_friend}\n\n"
-                    f"[00FF00][c][b][i]لتحويل السكواد ل 5 اشخاص أكتب الامر التالي : \n\n"
-                    f"[DC143C][c][b][i]{seq_5}\n\n"
-                    f"[00FF00][c][b][i]للتحويل سكواد من 6 اشخاص أكتب الامر التالي : \n\n"
-                    f"[DC143C][c][b][i]{seq_6}\n\n"
-                    f"[00FF00][c][b][i]للتحويل سكواد من 3 اشخاص أكتب الامر التالي : \n\n"
-                    f"[DC143C][c][b][i]{seq_3}\n\n"
-                    f"[00FF00][c][b][i]لتفعيل الرقصات : \n\n"
-                    f"[DC143C][c][b][i]{emote}\n[00FF00][c][b][i] متوفر 145 رقصة اكتب مثلا \n [DC143C][c][b][i]{emote}1 --⟩ 145 \n\n"
-                    f"[00FF00][c][b][i]لعمل سبام دعوات الانضمام للفريق إستخدم الامر التالي : \n\n"
-                    f"[DC143C][c][b][i]/{spam_inv}\n[00FF00][c][b][i]لإلغاء التفعيل أكتب \n [DC143C][c][b][i]/-{spam_inv}\n\n"
-                    f"[ff7f50][c][b][i]-----------------------------------\n\n"
-                	f"[ffff00][c][b][i]---⟩ Instagram : [ffffff][c][b][i]mrghost.antiban\n\n"
-                	f"[ffff00][c][b][i]---⟩ Instagram : [ffffff][c][b][i]k_elyamani6\n\n"
-                    f"[ff7f50][c][b][i]-----------------------------------"
-                    )
+    f"[ff7f50][c][b][i]-----------------------------------\n\n"
+    f"[ffffff][c][b][i]The available bot commands are:\n\n"
+    # f"[00FF00][c][b][i]Player info via ID:\n\n"
+    # f"[DC143C][c][b][i]{info}\n\n"
+    f"[00FF00][c][b][i]To add any player to your friends list via ID, use the following command:\n\n"
+    f"[DC143C][c][b][i]{fake_friend}\n\n"
+    f"[00FF00][c][b][i]To convert the squad to 5 players, type the following command:\n\n"
+    f"[DC143C][c][b][i]{seq_5}\n\n"
+    f"[00FF00][c][b][i]To convert the squad to 6 players, type the following command:\n\n"
+    f"[DC143C][c][b][i]{seq_6}\n\n"
+    f"[00FF00][c][b][i]To convert the squad to 3 players, type the following command:\n\n"
+    f"[DC143C][c][b][i]{seq_3}\n\n"
+    f"[00FF00][c][b][i]To activate emotes:\n\n"
+    f"[DC143C][c][b][i]{emote}\n"
+    f"[00FF00][c][b][i]145 emotes available. For example, type:\n"
+    f"[DC143C][c][b][i]{emote}1 --⟩ 145\n\n"
+    f"[00FF00][c][b][i]To spam team join invites, use the following command:\n\n"
+    f"[DC143C][c][b][i]/{spam_inv}\n"
+    f"[00FF00][c][b][i]To deactivate it, type:\n"
+    f"[DC143C][c][b][i]/-{spam_inv}\n\n"
+    f"[ff7f50][c][b][i]-----------------------------------\n\n"
+    f"[ffff00][c][b][i]---⟩ Instagram: [ffffff][c][b][i]mrghost.antiban\n\n"
+    f"[ffff00][c][b][i]---⟩ Instagram: [ffffff][c][b][i]k_elyamani6\n\n"
+    f"[ff7f50][c][b][i]-----------------------------------"
+)
 
-                    #threading.Thread(target=send_telegram_message,args=()).start()
-                    skwad = antidetection("--12345678")
-                    message2 = (
-                    f"[{generate_random_color()}][c][b]تم إضافة سبام الدعوات للمجموعة عن طريق الأيدي\n\n"
-                    f"[{generate_random_color()}][c][b]مثال : \n\n{skwad}"
-                    )
                     threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
-                    #time.sleep(0.2)
-                    #threading.Thread(target=ResponseMsg,args=(message2,client, self.EncryptedPlayerid)).start()
-                    message_telegram = f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_Command = help"
-                    threading.Thread(target=send_telegram_message,args=(message_telegram,)).start()
                 if '1200' in data.hex()[0:4] and b'/-inv' in data:
                         inviteD = False
                         message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]تم الغاء تفعيل سبام الدعوات \n\n"
-                        f"[ff7f50][c][b]-----------------------------------"
-                        )
+    f"[ff7f50][c][b]-----------------------------------\n\n"
+    f"[{generate_random_color()}][c][b]Invite spam deactivated\n\n"
+    f"[ff7f50][c][b]-----------------------------------"
+    )
+
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                         send_telegram_message(f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_command = inv")
                 if '1200' in data.hex()[0:4] and b'/id' in data:
@@ -415,11 +318,12 @@ class Proxy:
                         if '***' in id:
                         	id = id.replace('***', '106')
                         message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]جاري التحقق من معلومات الاعب : \n\n"
-                        f"[ffffff][c][b]{id}"
-                        f"\n\n[ff7f50][c][b]-----------------------------------"
-                        )
+    f"[ff7f50][c][b]-----------------------------------\n\n"
+    f"[{generate_random_color()}][c][b]Verifying player Id:\n\n"
+    f"[ffffff][c][b]{id}"
+    f"\n\n[ff7f50][c][b]-----------------------------------"
+)
+
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                         #threading.Thread(target=get_player_info,args=(id,client, self.EncryptedPlayerid)).start()
                         threading.Thread(target=Fake_Friend,args=(id,self.sock0500)).start()
@@ -430,19 +334,21 @@ class Proxy:
                         packet = bytes.fromhex(f"050000030908{self.EncryptedPlayerid}1005203a2afc0508{self.EncryptedPlayerid}12024d451801200232880508{self.EncryptedPlayerid}1215d8a3d8add881d985d8af4dcda23134e2bc83e29cbf1a024d452093e6c7be0628343084cbd1304218c59be061cc91e6608b9dd164c197a361c8bcce6480c38566480150b60258ed0f6096d9d0ad0368f28390ae037a05acd5cab00382012808f6daf1eb04120ed8b9d980d985d8a7d986d980d98a180720b888d4f0042a0808d19d85f30410039201090107090a0b12191a209801db01a0015aa801d9aff8b103ba010a08b985fe902310011864c00101e80101880208920208b930ea079215b810aa020a080110e43218807d2001aa02050802109035aa020a080f10e43218807d2001aa0205081710be4eaa0205081810b83caa0205081c108139aa0205082010a539aa0205082110e83caa0205082210c63baa0205082b10de3aaa0205083110f02eaa0205083910e052aa02050849109633aa0205081a10e432aa0205082310e432aa0205083d10e432aa0205084110e432aa0205084d10e432aa0205081b10e432aa0205083410e432aa0205082810c03eaa0205082910e432c2022712031a01011a0f0848120b0104050607f1a802f4a8021a0508501201631a060851120265662200d802a8a38daf03ea020410011801f202080883cab5ee01101b8a03009203009803b198b0b10ba20324efbca7efbca8efbcafefbcb3efbcb4e385a4efbcb4efbca5efbca1efbcade385a4e1b6abc2030a082c1001180320012801c2030a081e100f180320092801ca030a080210eec9d3be061801ca030a080410ba83d3be061805ca030a080510ddb1cdbe061801ca030a080610eec9d3be061801ca030a080b10df9ccdbe061807e203024f52ea0300f20300800464900402aa040408011001aa040408011003aa0411080f1d87b1da3f25e8e7673e2d7683293f3a011a403e50056801721e313734313831323439373339303930373138355f6b663530687473786e638801829080dae083f9ae1aa20100b001e301ea010449444331fa011e313734313831323439373339303931303033375f6b7865696d7a7a72726c")
                         self.sock0500.send(packet)
                         message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]لقد تم تحويل السكواد ل3 قم بإرسال دعوة للعالمية "
-                        f"\n\n[ff7f50][c][b]-----------------------------------"
-                        )
+    f"[ff7f50][c][b]-----------------------------------\n\n"
+    f"[{generate_random_color()}][c][b]The squad has been converted to 3 players. Send an invite to Global.\n\n"
+    f"[ff7f50][c][b]-----------------------------------"
+)
+
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                         message_telegram = f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_command = /3"
                         threading.Thread(target=send_telegram_message,args=(message_telegram,)).start()
                 if '1200' in data.hex()[0:4] and b'/6' in data and 700 > len(data.hex()):
                         message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]لقد تم تحويل السكواد ل6 قم بإرسال دعوة للعالمية "
-                        f"\n\n[ff7f50][c][b]-----------------------------------"
-                        )
+    f"[ff7f50][c][b]-----------------------------------\n\n"
+    f"[{generate_random_color()}][c][b]The squad has been converted to 6 players. Send an invite to Global.\n\n"
+    f"[ff7f50][c][b]-----------------------------------"
+)
+
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                         threading.Thread(target=self.gen_squad6).start()
                         #threading.Thread(target=send_telegram_message,args=()).start()
@@ -451,10 +357,10 @@ class Proxy:
                         #send_telegram_message(f"User_id = {Decrypted_id(self.EncryptedPlayerid)}\nused_command = /6")
                 if '1200' in data.hex()[0:4] and b'/5' in data and 700 > len(data.hex()):
                         message = (
-                        f"[ff7f50][c][b]-----------------------------------\n\n"
-                        f"[{generate_random_color()}][c][b]لقد تم تحويل السكواد ل5 قم بإرسال دعوة للعالمية "
-                        f"\n\n[ff7f50][c][b]-----------------------------------"
-                        )
+    f"[ff7f50][c][b]-----------------------------------\n\n"
+    f"[{generate_random_color()}][c][b]The squad has been converted to 5 players. Send an invite to Global.\n\n"
+    f"[ff7f50][c][b]-----------------------------------"
+    )
                         threading.Thread(target=ResponseMsg,args=(message,client, self.EncryptedPlayerid)).start()
                         threading.Thread(target=self.invisible).start()
                         #threading.Thread(target=send_telegram_message,args=()).start()
