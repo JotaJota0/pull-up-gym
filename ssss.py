@@ -13,7 +13,7 @@ SOCKS_VERSION = 5
 inviteD= False
 
 def data_decode(hex_payload):
-    url = 'https://polydevapi.vercel.app/decode'
+    url = 'https://ghostapi-inky.vercel.app/decode'
 
     payload = {
         "Decrypted_Payload": hex_payload
@@ -27,7 +27,7 @@ def data_decode(hex_payload):
         return {"error": response.text}
 
 def Decrypted_id(id_value):
-    url = f"https://polydevapi.vercel.app/decrypt_id?id={id_value}"
+    url = f"https://ghostapi-inky.vercel.app/decrypt_id?id={id_value}"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -129,7 +129,7 @@ def get_player_info(player_id, client_socket, client_id):
     except requests.exceptions.RequestException as e:
         print(f"حدث خطأ: {e}")
 def Fake_Friend(id, client_socket):
-    url = f"https://polydevapi.vercel.app/fake"
+    url = f"https://ghostapi-inky.vercel.app/fake"
     response = requests.post(url, data={'target_id': id})
     
     if response.status_code == 200:
@@ -151,7 +151,7 @@ def generate_random_color():
 
 def GenResponsMsg(player_id, message):
     encoded_message = urllib.parse.quote(message)
-    url = f"https://polydevapi.vercel.app/generate"
+    url = f"https://ghostapi-inky.vercel.app/generate"
     response = requests.post(url, data={'player_id': player_id, 'msg': encoded_message})
     
     if response.status_code == 200:
@@ -162,7 +162,7 @@ def GenResponsMsg(player_id, message):
         
 
 def random_emote(number):
-    url = f"https://polydevapi.vercel.app/random_emote?number={number}"
+    url = f"https://ghostapi-inky.vercel.app/random_emote?number={number}"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -178,7 +178,7 @@ def dance(id, dance_nbr=None):
     return f"050000002008{id}100520162a1408{id}10{emote}2a0608{id}"
 
 def Encrypt(id_value):
-    url = f"https://polydevapi.vercel.app/ecrypt_id?id={id_value}"
+    url = f"https://ghostapi-inky.vercel.app/ecrypt_id?id={id_value}"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
